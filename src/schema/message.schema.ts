@@ -10,7 +10,7 @@ export class Message extends Document {
     receiver: {avatar: string, login_name: string, id_login_name: string, userId: ObjectId}[];
 
     @Prop()
-    content_message: string;
+    content_message: string; 
 
     @Prop()
     image: string;
