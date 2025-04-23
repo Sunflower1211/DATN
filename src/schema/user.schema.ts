@@ -31,7 +31,7 @@ export class User extends Document {
     @Prop({required: true})
     role: string;
 
-    @Prop({required: true})
+    @Prop()
     avatar: string;
 
     @Prop()
