@@ -10,35 +10,38 @@ export class User extends Document {
     @Prop({required: true})
     password: string;
 
-    @Prop({required: true})
+    @Prop()
     login_name: string;
 
-    @Prop({ required: true, unique: true })
+    @Prop()
     id_login_name: string;
 
-    @Prop()
+    @Prop({default: ''})
     email: string;
 
-    @Prop()
+    @Prop({default: ''})
     phone: string;
 
-    @Prop({ required: false, unique: true }) //emai liên kết để lấy mk khi quên
+    @Prop({ unique: true }) //emai liên kết để lấy mk khi quên
     associated_email: string;
 
-    @Prop({ required: false, unique: true })//SDT liên kết để lấy mk khi quên
+    @Prop({ unique: true })//SDT liên kết để lấy mk khi quên
     associated_phone: string;
 
-    @Prop({required: true})
+    @Prop({default: 'user'})
     role: string;
 
-    @Prop()
+    @Prop({default: ''})
     avatar: string;
 
-    @Prop()
+    @Prop({default: ''})
     address: string;
 
-    @Prop()
+    @Prop({default: 5})
     star: number;
+
+    @Prop({default: ''})
+    sex: string;
 
     @Prop({type: mongoose.Schema.Types.ObjectId, ref: 'Post'})
     save_jobs: Post[];

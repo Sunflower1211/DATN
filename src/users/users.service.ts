@@ -14,8 +14,9 @@ export class UsersService {
     async Login(account: string, password: string) {
         const user = await this.user.findOne({ account, password });
         if (user) {
-            const token = this.jwtService.generateToken(user)
+            const token = this.jwtService.generateToken({ account })
             return {
+                status: 200,
                 message: 'token creation successfully',
                 token,
             };
@@ -26,7 +27,43 @@ export class UsersService {
         }
     }
 
-    async Register (account: string, password: string) {
-
+    async Register (account: string, password: string, login_name: string) {
+        const user = await this.user.findOne({ account });
+        const user1 = await this.user.findOne({ login_name });
+        if(user){
+            return {
+                message: 'account',
+            }
+        }else if(user1) {
+            return {
+                message: 'login_name',
+            }
+        } 
+        else{
+            await this.user.create({account, password, login_name})
+            return {
+                message: 'register success',
+                status: 200
+            }
+        }
     }
+
+    async infoUser (token: string) {
+        const data = await this.jwtService.verifyToken(token);
+
+        const user = await this.user.findOne({ account: data?.account });
+
+        if (user) {
+            return {
+                user,
+                status: 200,
+                message: 'success',
+            };
+        } else {
+            return {
+                message: 'fail',
+            };
+        }
+    }
+
 }

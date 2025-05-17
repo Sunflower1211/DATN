@@ -11,4 +11,14 @@ export class UsersController {
         return this.service.Login(data.account, data.password);
     }
 
+    @Post('/register')
+    async Register(@Body() data: any){
+        return this.service.Register(data.account, data.password, data.login_name);
+    }
+
+    @Get('/info-user')
+    async infoUser(@Query('token') token: string){
+        return this.service.infoUser(token);
+    }
+
 }
