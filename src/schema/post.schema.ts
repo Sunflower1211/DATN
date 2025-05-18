@@ -1,12 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId } from 'mongoose';
+import { Types } from 'mongoose';
 
 @Schema()
 export class Post extends Document {
-    @Prop({ required: true, default: [] })
-    user: {avatar: string, login_name: string, id_login_name: string, user_id: ObjectId}[];
+    @Prop({ type: Types.ObjectId, ref: 'User' })
+    user_id: Types.ObjectId;
 
-    @Prop({ required: true })
+    @Prop()
+    title: string;
+
+    @Prop()
     description: string;
 
     @Prop()

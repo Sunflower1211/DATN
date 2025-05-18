@@ -14,7 +14,7 @@ export class UsersService {
     async Login(account: string, password: string) {
         const user = await this.user.findOne({ account, password });
         if (user) {
-            const token = this.jwtService.generateToken({ account })
+            const token = this.jwtService.generateToken({ account, user_id: user?._id })
             return {
                 status: 200,
                 message: 'token creation successfully',

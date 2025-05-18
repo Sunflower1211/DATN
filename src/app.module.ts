@@ -6,6 +6,8 @@ import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from './jwt/jwt.module';
 import { AuthMiddleware } from './middleware/auth.middleware';
+import { PostsController } from './posts/posts.controller';
+import { PostsModule } from './posts/posts.module';
 
 @Module({
     imports: [
@@ -13,8 +15,9 @@ import { AuthMiddleware } from './middleware/auth.middleware';
         MongooseModule.forRoot(process.env.MONGO_URI),
         UsersModule,
         JwtModule,
+        PostsModule,
     ],
-    controllers: [AppController],
+    controllers: [AppController, PostsController],
     providers: [AppService],
 })
 export class AppModule {
