@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -8,13 +8,13 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post('/create-post')
-  async create(@Body() createPostDto: CreatePostDto) {
-    return await this.postsService.create(createPostDto);
+  async create(@Body() createPostDto: CreatePostDto, @Request() req: any) {
+    return await this.postsService.create(createPostDto, req?.user?.account);
   }
 
-  @Get()
-  findAll() {
-    return this.postsService.findAll();
+  @Get('/get-posts')
+  async findAll(@Request() req: any) {
+    return await this.postsService.findAll(req?.user?.account);
   }
 
   @Get(':id')
