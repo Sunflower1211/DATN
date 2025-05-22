@@ -13,8 +13,13 @@ export class PostsController {
   }
 
   @Get('/get-posts')
-  async findAll(@Request() req: any) {
-    return await this.postsService.findAll(req?.user?.account);
+  async findAll() {
+    return await this.postsService.findAll();
+  }
+
+  @Get('/get-posts-user')
+  async findAllPostUser(@Request() req: any) {
+    return await this.postsService.findAllPostUser(req?.user?.account);
   }
 
   @Get(':id')
@@ -22,13 +27,13 @@ export class PostsController {
     return this.postsService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
-    return this.postsService.update(+id, updatePostDto);
+  @Post('/update/:id')
+  async update(@Body() UpdatePostDto: UpdatePostDto, @Param('id') id: string) {
+    return await this.postsService.update(UpdatePostDto, id);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.postsService.remove(+id);
+  @Delete('/delete/:id')
+  async remove(@Param('id') id: string) {
+    return await this.postsService.remove(id);
   }
 }

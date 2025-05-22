@@ -7,6 +7,11 @@ import { User } from 'src/schema/user.schema';
 import { Model } from 'mongoose';
 import { Types } from 'mongoose';
 
+interface user_interface {
+    avatar?: string;
+    login_name?: string;
+}
+
 @Injectable()
 export class PostsService {
     constructor(
@@ -31,14 +36,29 @@ export class PostsService {
         }
     }
 
-    async findAll(account: string) {
-        const record_posts = await this.post.find({ account }).sort({ created_at: -1 }).lean();
-        const record_users = await this.user.findOne({ account }).lean();
-        const result = record_posts.map(post => ({
-            ...post,
-            logo: record_users?.avatar || null,
-            company: record_users?.account || null,
-        }));
+    async findAll() {
+        const record_posts = await this.post.find().sort({ created_at: -1 }).populate('user_id').lean();
+        const result = record_posts.map(post => {
+            const user = post.user_id as user_interface;
+            return {
+                ...post,
+                logo: user?.avatar || null,
+                company: user?.login_name || null,
+            };
+        });
+        return result;
+    }
+
+    async findAllPostUser(account: string) {
+        const record_posts = await this.post.find({ account }).sort({ created_at: -1 }).populate('user_id').lean();
+        const result = record_posts.map(post => {
+            const user = post.user_id as user_interface;
+            return {
+                ...post,
+                logo: user?.avatar || null,
+                company: user?.login_name || null,
+            };
+        });
         return result;
     }
 
@@ -46,11 +66,25 @@ export class PostsService {
         return `This action returns a #${id} post`;
     }
 
-    update(id: number, updatePostDto: UpdatePostDto) {
-        return `This action updates a #${id} post`;
+    async update(updatePostDto: UpdatePostDto, id: string) {
+        return '';
     }
 
-    remove(id: number) {
-        return `This action removes a #${id} post`;
+    async remove(id: string) {
+        const post_id = new Types.ObjectId(id);
+        console.log('post_id: ', post_id);
+        const deletedPost = await this.post.findByIdAndDelete(post_id );
+        console.log('deletedPost: ', deletedPost)
+
+        if (deletedPost) {
+            return {
+                status_code: 200,
+                message: 'xóa post thành công'
+            }
+        } else {
+            return {
+                message: 'xóa post thất bại'
+            }
+        }
     }
 }
