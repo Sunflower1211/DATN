@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UploadedFile, UseInterceptors, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, Request, UploadedFile, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { LoginDto } from './dto/login.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -16,12 +16,29 @@ export class UsersController {
 
     @Post('/register')
     async Register(@Body() data: any) {
-        return this.service.Register(data.account, data.password, data.login_name);
+        return this.service.Register(data.account, data.password, data.login_name, data?.email);
     }
 
     @Get('/info-user')
     async infoUser(@Query('token') token: string) {
         return this.service.infoUser(token);
+    }
+
+    @Get('get-save-job')
+    async getSaveJob(@Request() req: any) {
+        return await this.service.getSaveJob(req?.user?.account);
+    }
+
+    @Post('add-save-job')
+    async addSaveJob(@Request() req: any, @Body() data: any) {
+        await this.service.addSaveJob(req?.user?.account, data?.id);
+        return true;
+    }
+
+    @Post('delete-save-job')
+    async deleteSaveJob(@Request() req: any, @Body() data: any) {
+        await this.service.deleteSaveJob(req?.user?.account, data?.id);
+        return true;
     }
 
     @Post('/update-avatar')

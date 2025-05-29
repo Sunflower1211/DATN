@@ -13,9 +13,6 @@ export class User extends Document {
     @Prop()
     login_name: string;
 
-    @Prop()
-    id_login_name: string;
-
     @Prop({ default: '' })
     email: string;
 
@@ -43,14 +40,14 @@ export class User extends Document {
     @Prop({ default: '' })
     sex: string;
 
-    @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Post' })
+    @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }] })
     save_jobs: Post[];
 
     @Prop({ default: [] })
-    follwing: { avatar: string; login_name: string; id_login_name: string; user_id: ObjectId }[];
+    follwing: { avatar: string; login_name: string; user_id: ObjectId }[];
 
     @Prop({ default: [] })
-    followers: { avatar: string; login_name: string; id_login_name: string; user_id: ObjectId }[];
+    followers: { avatar: string; login_name: string; user_id: ObjectId }[];
 
     @Prop()
     updated_at: Date;

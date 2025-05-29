@@ -62,7 +62,7 @@ export class PostsService {
         return result;
     }
 
-    findOne(id: number) {
+    findOne(id: string) {
         return `This action returns a #${id} post`;
     }
 
