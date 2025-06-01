@@ -46,7 +46,6 @@ export class UsersController {
         return true;
     }
 
-    
     @Get('get-follow')
     async getFollow(@Request() req: any) {
         return await this.service.getFollow(req?.user?.account);
@@ -61,6 +60,29 @@ export class UsersController {
     @Post('delete-follow')
     async deleteFollow(@Request() req: any, @Body() data: any) {
         await this.service.deleteFollow(req?.user?.account, data?.id);
+        return true;
+    }
+
+    @Get('get-comment')
+    async getComment(@Request() req: any) {
+        return await this.service.getComment(req?.user?.account);
+    }
+
+    @Post('add-comment')
+    async addComment(@Request() req: any, @Body() data: any) {
+        await this.service.addComment(req?.user?.account, data?.content, data?.star);
+        return true;
+    }
+
+    @Post('delete-comment')
+    async deleteComment(@Request() req: any, @Body() data: any) {
+        await this.service.deleteComment(req?.user?.account, data?.id);
+        return true;
+    }
+
+    @Post('edit-comment')
+    async edit(@Request() req: any, @Body() data: any) {
+        await this.service.editComment(req?.user?.account, data?.comment);
         return true;
     }
 

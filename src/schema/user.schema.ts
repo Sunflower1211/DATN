@@ -34,6 +34,9 @@ export class User extends Document {
     @Prop({ default: '' })
     address: string;
 
+        @Prop()
+    description: string;
+
     @Prop({ default: 5 })
     star: number;
 
@@ -59,6 +62,9 @@ export class User extends Document {
 
     @Prop({ default: [] })
     followers: string[];
+
+    @Prop({ default: [] })
+    comment: { login_name: string; user_id: ObjectId; content: string, updated_at: Date, star: number, id: number }[];
 
     @Prop()
     updated_at: Date;

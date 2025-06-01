@@ -16,8 +16,17 @@ export class Post extends Document {
     @Prop({ default: '' })
     exp: string;
 
-    @Prop()
+    //mô tả công việc
+    @Prop({ default: '' })
     description: string;
+
+    //yêu cầu ứng viên
+    @Prop({ default: '' })
+    candidate_requirement: string;
+
+    //quyền lợi
+    @Prop({ default: '' })
+    interest: string;
 
     @Prop()
     address: string;

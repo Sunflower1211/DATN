@@ -66,8 +66,16 @@ export class UsersService {
     }
 
     async getSaveJob(account: string) {
-        const user = await this.user.findOne({ account }).populate('save_jobs');
-        return user?.save_jobs ? user?.save_jobs : [];
+        let result: object[] = [];
+        const user = await this.user.findOne({ account }).populate('save_jobs').lean();
+        const save_jobs = user?.save_jobs;
+        for (let i = 0; i < save_jobs.length; i++) {
+            const id = save_jobs[i].user_id;
+            const user = await this.user.findById(id).lean();
+            const save_job = { ...save_jobs[i], user };
+            result.push(save_job);
+        }
+        return result;
     }
 
     async addSaveJob(account: string, id: string) {
@@ -77,6 +85,7 @@ export class UsersService {
 
     async deleteSaveJob(account: string, id: string) {
         const save_job_id = new Types.ObjectId(id);
+        console.log({ account, id });
         await this.user.updateOne({ account }, { $pull: { save_jobs: save_job_id } });
     }
 
@@ -96,5 +105,57 @@ export class UsersService {
     async getUser(id: string) {
         const user_id = new Types.ObjectId(id);
         return await this.user.findById(user_id);
+    }
+
+    async getComment(account: string) {
+        const user = await this.user.findOne({ account }).lean();
+        return user?.comment.length ? user?.comment : [];
+    }
+
+    async addComment(account: string, content: string, star: number) {
+        const user = await this.user.findOne({ account }).lean();
+        const comment = {
+            login_name: user?.login_name,
+            user_id: user?._id,
+            content,
+            updated_at: new Date(),
+            star,
+            id: user?.comment[0]?.id ? user?.comment[0]?.id + 1 : 1,
+        };
+        await this.user.updateOne(
+            { account: user?.account },
+            {
+                $push: {
+                    comment: {
+                        $each: [comment],
+                        $position: 0,
+                    },
+                },
+            },
+        );
+    }
+
+    async deleteComment(account: string, id: number) {
+        const user = await this.user.findOne({ account }).lean();
+        await this.user.updateOne({ account: user?.account }, { $pull: { comment: { id } } });
+    }
+
+    async editComment(account: string, comment: any) {
+        const user = await this.user.findOne({ account }).lean();
+        await this.user.updateOne({ account: user?.account }, { $pull: { comment: { id: comment?.id } } });
+        comment.updated_at = new Date();
+        comment.login_name = comment.author;
+        comment.star = comment.rating;
+        await this.user.updateOne(
+            { account: user?.account },
+            {
+                $push: {
+                    comment: {
+                        $each: [comment],
+                        $position: 0,
+                    },
+                },
+            },
+        );
     }
 }

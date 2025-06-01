@@ -36,6 +36,22 @@ export class PostsService {
         }
     }
 
+    async editPost(post: any, account: string) {
+        const user_id = new Types.ObjectId(post._id);
+        const record_post = await this.post.updateOne({ _id: post._id }, post);
+
+        if (record_post) {
+            return {
+                status_code: 201,
+                message: 'create post success',
+            };
+        } else {
+            return {
+                message: 'create post fail',
+            };
+        }
+    }
+
     async findAll() {
         const record_posts = await this.post.find().sort({ created_at: -1 }).populate('user_id').lean();
         const result = record_posts.map(post => {
@@ -64,7 +80,7 @@ export class PostsService {
 
     async findOne(id: string) {
         const post_id = new Types.ObjectId(id);
-        return await this.post.findById(post_id).populate('user_id')
+        return await this.post.findById(post_id).populate('user_id');
     }
 
     async update(updatePostDto: UpdatePostDto, id: string) {
@@ -74,18 +90,18 @@ export class PostsService {
     async remove(id: string) {
         const post_id = new Types.ObjectId(id);
         console.log('post_id: ', post_id);
-        const deletedPost = await this.post.findByIdAndDelete(post_id );
-        console.log('deletedPost: ', deletedPost)
+        const deletedPost = await this.post.findByIdAndDelete(post_id);
+        console.log('deletedPost: ', deletedPost);
 
         if (deletedPost) {
             return {
                 status_code: 200,
-                message: 'xóa post thành công'
-            }
+                message: 'xóa post thành công',
+            };
         } else {
             return {
-                message: 'xóa post thất bại'
-            }
+                message: 'xóa post thất bại',
+            };
         }
     }
 }

@@ -10,6 +10,15 @@ export class CreatePostDto {
     description: string;
 
     @IsString()
+    exp: string;
+
+    @IsString()
+    candidate_requirement: string;
+
+    @IsString()
+    interest: string;
+
+    @IsString()
     address: string;
 
     @IsString()

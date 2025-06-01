@@ -12,6 +12,11 @@ export class PostsController {
         return await this.postsService.create(createPostDto, req?.user?.account);
     }
 
+    @Post('/edit-post')
+    async editPost(@Body() data: any, @Request() req: any) {
+        return await this.postsService.editPost(data, req?.user?.account);
+    }
+
     @Get('/get-posts')
     async findAll() {
         return await this.postsService.findAll();
@@ -21,7 +26,7 @@ export class PostsController {
     async findAllPostUser(@Request() req: any, @Query('account') account: string) {
         let user_account = req?.user?.account;
 
-        if (account) {  
+        if (account) {
             user_account = account;
         }
 
