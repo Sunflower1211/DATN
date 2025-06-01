@@ -40,6 +40,17 @@ export class User extends Document {
     @Prop({ default: '' })
     sex: string;
 
+    //lĩnh vực
+    @Prop({ default: '' })
+    field: string;
+
+    //quy mô
+    @Prop({ default: '' })
+    scale: string;
+
+    @Prop({ default: '' })
+    web: string;
+
     @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }] })
     save_jobs: Post[];
 
@@ -47,7 +58,7 @@ export class User extends Document {
     follwing: { avatar: string; login_name: string; user_id: ObjectId }[];
 
     @Prop({ default: [] })
-    followers: { avatar: string; login_name: string; user_id: ObjectId }[];
+    followers: string[];
 
     @Prop()
     updated_at: Date;

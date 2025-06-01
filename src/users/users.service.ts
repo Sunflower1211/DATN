@@ -72,11 +72,29 @@ export class UsersService {
 
     async addSaveJob(account: string, id: string) {
         const save_job_id = new Types.ObjectId(id);
-        await this.user.updateOne({ account }, { $push: { save_jobs: save_job_id }  });
+        await this.user.updateOne({ account }, { $push: { save_jobs: save_job_id } });
     }
 
     async deleteSaveJob(account: string, id: string) {
         const save_job_id = new Types.ObjectId(id);
         await this.user.updateOne({ account }, { $pull: { save_jobs: save_job_id } });
+    }
+
+    async addFollow(account: string, id: string) {
+        await this.user.updateOne({ account }, { $push: { followers: id } });
+    }
+
+    async deleteFollow(account: string, id: string) {
+        await this.user.updateOne({ account }, { $pull: { followers: id } });
+    }
+
+    async getFollow(account: string) {
+        const user = await this.user.findOne({ account }).populate('followers');
+        return user?.followers ? user?.followers : [];
+    }
+
+    async getUser(id: string) {
+        const user_id = new Types.ObjectId(id);
+        return await this.user.findById(user_id);
     }
 }

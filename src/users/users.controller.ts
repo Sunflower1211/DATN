@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Request, UploadedFile, UseInterceptors, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Request, UploadedFile, UseInterceptors, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { LoginDto } from './dto/login.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -24,6 +24,11 @@ export class UsersController {
         return this.service.infoUser(token);
     }
 
+    @Get('/get-user/:id')
+    async getUser(@Param('id') id: string) {
+        return await this.service.getUser(id);
+    }
+
     @Get('get-save-job')
     async getSaveJob(@Request() req: any) {
         return await this.service.getSaveJob(req?.user?.account);
@@ -38,6 +43,24 @@ export class UsersController {
     @Post('delete-save-job')
     async deleteSaveJob(@Request() req: any, @Body() data: any) {
         await this.service.deleteSaveJob(req?.user?.account, data?.id);
+        return true;
+    }
+
+    
+    @Get('get-follow')
+    async getFollow(@Request() req: any) {
+        return await this.service.getFollow(req?.user?.account);
+    }
+
+    @Post('add-follow')
+    async addFollow(@Request() req: any, @Body() data: any) {
+        await this.service.addFollow(req?.user?.account, data?.id);
+        return true;
+    }
+
+    @Post('delete-follow')
+    async deleteFollow(@Request() req: any, @Body() data: any) {
+        await this.service.deleteFollow(req?.user?.account, data?.id);
         return true;
     }
 

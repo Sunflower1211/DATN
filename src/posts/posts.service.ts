@@ -50,7 +50,7 @@ export class PostsService {
     }
 
     async findAllPostUser(account: string) {
-        const record_posts = await this.post.find({ account }).sort({ created_at: -1 }).populate('user_id').lean();
+        let record_posts = await this.post.find({ account }).sort({ created_at: -1 }).populate('user_id').lean();
         const result = record_posts.map(post => {
             const user = post.user_id as user_interface;
             return {
@@ -62,8 +62,9 @@ export class PostsService {
         return result;
     }
 
-    findOne(id: string) {
-        return `This action returns a #${id} post`;
+    async findOne(id: string) {
+        const post_id = new Types.ObjectId(id);
+        return await this.post.findById(post_id).populate('user_id')
     }
 
     async update(updatePostDto: UpdatePostDto, id: string) {

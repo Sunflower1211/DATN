@@ -13,6 +13,9 @@ export class Post extends Document {
     @Prop()
     title: string;
 
+    @Prop({ default: '' })
+    exp: string;
+
     @Prop()
     description: string;
 
