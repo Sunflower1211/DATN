@@ -55,35 +55,5 @@ export class ApplyController {
         };
     }
 
-    @Post('upload-image')
-    @UseInterceptors(
-        FileInterceptor('file', {
-            storage: diskStorage({
-                destination: './uploads/image',
-                filename: (req, file, cb) => {
-                    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-                    cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
-                },
-            }),
-            limits: { fileSize: 2 * 1024 * 1024 }, // Giới hạn 2MB cho ảnh
-            fileFilter: (req, file, cb) => {
-                const ext = extname(file.originalname).toLowerCase();
-                if (['.jpg', '.jpeg', '.png'].includes(ext)) {
-                    cb(null, true);
-                } else {
-                    cb(new Error('Only .jpg, .jpeg, .png files are allowed'), false);
-                }
-            },
-        }),
-    )
-    async uploadImage(@UploadedFile() file: Express.Multer.File, @Body() body: { name: string; email: string }) {
-        console.log('Ảnh uploaded:', file);
-        console.log('Form data:', body);
 
-        return {
-            message: 'Upload ảnh thành công',
-            file: file,
-            data: body,
-        };
-    }
 }

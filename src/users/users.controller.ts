@@ -30,7 +30,7 @@ export class UsersController {
     }
 
     @Post('/edit-user')
-    async editUser(@Request() req: any, @Body() data: any){
+    async editUser(@Request() req: any, @Body() data: any) {
         await this.service.editUser(req?.user?.account, data);
         return true;
     }
@@ -92,32 +92,35 @@ export class UsersController {
         return true;
     }
 
-
-
-    @Post('/update-avatar')
+    @Post('upload-image')
     @UseInterceptors(
         FileInterceptor('file', {
             storage: diskStorage({
-                destination: './uploads',
-                filename: (req, file, callback) => {
+                destination: './uploads/image',
+                filename: (req, file, cb) => {
                     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-                    const ext = extname(file.originalname);
-                    const filename = `${file.fieldname}-${uniqueSuffix}${ext}`;
-                    callback(null, filename);
+                    cb(null, `${uniqueSuffix}${extname(file.originalname)}`);
                 },
             }),
-            fileFilter: (req, file, callback) => {
-                if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
-                    return callback(new Error('Only image files are allowed!'), false);
+            limits: { fileSize: 2 * 1024 * 1024 }, // Giới hạn 2MB cho ảnh
+            fileFilter: (req, file, cb) => {
+                const ext = extname(file.originalname).toLowerCase();
+                if (['.jpg', '.jpeg', '.png'].includes(ext)) {
+                    cb(null, true);
+                } else {
+                    cb(new Error('Only .jpg, .jpeg, .png files are allowed'), false);
                 }
-                callback(null, true);
             },
         }),
     )
-    uploadFile(@UploadedFile() file: Express.Multer.File) {
+    async uploadImage(@UploadedFile() file: Express.Multer.File, @Body() body: { name: string; email: string }) {
+        console.log('Ảnh uploaded:', file);
+        console.log('Form data:', body);
+
         return {
-            message: 'Upload thành công!',
-            filePath: `/uploads/${file.filename}`,
+            message: 'Upload ảnh thành công',
+            file: file,
+            data: body,
         };
     }
 }

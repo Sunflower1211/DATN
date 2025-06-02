@@ -14,6 +14,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
     imports: [
+        ConfigModule.forRoot({
+            isGlobal: true,
+        }),
         ConfigModule.forRoot({ envFilePath: 'process.env', isGlobal: true }),
         MongooseModule.forRoot(process.env.MONGO_URI),
         UsersModule,
@@ -28,8 +31,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
                     port: 587,
                     secure: false,
                     auth: {
-                        user: process.env.EMAIL_USER,
-                        pass: process.env.EMAIL_PASS,
+                        user: config.get('EMAIL_USER'),
+                        pass: config.get('EMAIL_PASS'),
                     },
                 },
                 defaults: {
