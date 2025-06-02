@@ -29,6 +29,12 @@ export class UsersController {
         return await this.service.getUser(id);
     }
 
+    @Post('/edit-user')
+    async editUser(@Request() req: any, @Body() data: any){
+        await this.service.editUser(req?.user?.account, data);
+        return true;
+    }
+
     @Get('get-save-job')
     async getSaveJob(@Request() req: any) {
         return await this.service.getSaveJob(req?.user?.account);

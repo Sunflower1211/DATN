@@ -37,23 +37,11 @@ export class PostsService {
     }
 
     async editPost(post: any, account: string) {
-        const user_id = new Types.ObjectId(post._id);
         const record_post = await this.post.updateOne({ _id: post._id }, post);
-
-        if (record_post) {
-            return {
-                status_code: 201,
-                message: 'create post success',
-            };
-        } else {
-            return {
-                message: 'create post fail',
-            };
-        }
     }
 
     async findAll() {
-        const record_posts = await this.post.find().sort({ created_at: -1 }).populate('user_id').lean();
+        const record_posts = await this.post.find().sort({ updated_at: -1 }).populate('user_id').lean();
         const result = record_posts.map(post => {
             const user = post.user_id as user_interface;
             return {
@@ -66,7 +54,7 @@ export class PostsService {
     }
 
     async findAllPostUser(account: string) {
-        let record_posts = await this.post.find({ account }).sort({ created_at: -1 }).populate('user_id').lean();
+        let record_posts = await this.post.find({ account }).sort({ updated_at: -1 }).populate('user_id').lean();
         const result = record_posts.map(post => {
             const user = post.user_id as user_interface;
             return {

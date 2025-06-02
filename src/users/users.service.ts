@@ -65,6 +65,10 @@ export class UsersService {
         }
     }
 
+    async editUser(account: string, user: any) {
+        await this.user.updateOne({account}, user)
+    }
+
     async getSaveJob(account: string) {
         let result: object[] = [];
         const user = await this.user.findOne({ account }).populate('save_jobs').lean();
