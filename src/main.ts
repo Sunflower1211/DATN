@@ -16,6 +16,9 @@ async function bootstrap() {
         credentials: true,
     });
 
+    app.useBodyParser('json');
+    app.useBodyParser('urlencoded', { extended: true });
+
     await app.listen(3000);
 }
 bootstrap();

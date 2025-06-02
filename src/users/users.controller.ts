@@ -92,6 +92,8 @@ export class UsersController {
         return true;
     }
 
+
+
     @Post('/update-avatar')
     @UseInterceptors(
         FileInterceptor('file', {
