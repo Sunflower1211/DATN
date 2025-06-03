@@ -132,18 +132,32 @@ export class UsersController {
         }),
     )
     async uploadImage(@UploadedFile() file: Express.Multer.File, @Body() body: any, @Request() req: any) {
-        const avatar = `/uploads/image/${file.filename}`;
-        const data: any = {
-            avatar,
-            description: body?.description || '',
-            login_name: body?.login_name || '',
-            field: body?.field || '',
-            scale: body?.scale || '',
-            phone: body?.phone || '',
-            email: body?.email || '',
-            web: body?.web || '',
-            address: body?.address || '',
-        };
+        let data: any = {};
+        if (file?.filename) {
+            const avatar = `/uploads/image/${file?.filename}`;
+            data = {
+                avatar,
+                description: body?.description || '',
+                login_name: body?.login_name || '',
+                field: body?.field || '',
+                scale: body?.scale || '',
+                phone: body?.phone || '',
+                email: body?.email || '',
+                web: body?.web || '',
+                address: body?.address || '',
+            };
+        } else {
+            data = {
+                description: body?.description || '',
+                login_name: body?.login_name || '',
+                field: body?.field || '',
+                scale: body?.scale || '',
+                phone: body?.phone || '',
+                email: body?.email || '',
+                web: body?.web || '',
+                address: body?.address || '',
+            };
+        }
 
         return await this.service.editUserCompany(req?.user?.account, data);
     }

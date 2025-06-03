@@ -136,13 +136,15 @@ export class UsersService {
     async addComment(account: string, content: string, star: number, account_comment: string) {
         const user_comment = await this.user.findOne({ account: account_comment }).lean();
         const user = await this.user.findOne({ account }).lean();
+        const comment_old = user?.comment || [];
+        const id = comment_old.length > 0 ? (comment_old[0]?.id + 1) : 1
         const comment = {
             login_name: user_comment?.login_name,
             user_id: user_comment?._id,
             content,
             updated_at: new Date(),
             star,
-            id: user?.comment[0]?.id ? user?.comment[0]?.id + 1 : 1,
+            id
         };
         await this.user.updateOne(
             { account },
