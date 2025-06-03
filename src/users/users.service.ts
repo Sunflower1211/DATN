@@ -66,13 +66,13 @@ export class UsersService {
     }
 
     async editUser(account: string, user: any) {
-        await this.user.updateOne({account}, user)
+        await this.user.updateOne({ account }, user);
     }
 
     async getSaveJob(account: string) {
         let result: object[] = [];
         const user = await this.user.findOne({ account }).populate('save_jobs').lean();
-        const save_jobs = user?.save_jobs;
+        const save_jobs = user?.save_jobs || [];
         for (let i = 0; i < save_jobs.length; i++) {
             const id = save_jobs[i].user_id;
             const user = await this.user.findById(id).lean();
@@ -84,7 +84,17 @@ export class UsersService {
 
     async addSaveJob(account: string, id: string) {
         const save_job_id = new Types.ObjectId(id);
-        await this.user.updateOne({ account }, { $push: { save_jobs: save_job_id } });
+        await this.user.updateOne(
+            { account },
+            {
+                $push: {
+                    save_jobs: {
+                        $each: [save_job_id],
+                        $position: 0,
+                    },
+                },
+            },
+        );
     }
 
     async deleteSaveJob(account: string, id: string) {
@@ -93,17 +103,24 @@ export class UsersService {
         await this.user.updateOne({ account }, { $pull: { save_jobs: save_job_id } });
     }
 
-    async addFollow(account: string, id: string) {
-        await this.user.updateOne({ account }, { $push: { followers: id } });
+    async deleteApplyJob(account: string, id: string) {
+        const apply_job_id = new Types.ObjectId(id);
+        await this.user.updateOne({ account }, { $pull: { apply_jobs: apply_job_id } });
     }
 
-    async deleteFollow(account: string, id: string) {
-        await this.user.updateOne({ account }, { $pull: { followers: id } });
+    async addFollow(account: string, data: any) {
+        await this.user.updateOne({ account }, { $push: { follwing: data?.id } });
+        await this.user.updateOne({ account: data?.account }, { $push: { followers: data?.id1 } });
+    }
+
+    async deleteFollow(account: string, data: any) {
+        await this.user.updateOne({ account }, { $pull: { follwing: data.id } });
+        await this.user.updateOne({ account: data?.account }, { $pull: { followers: data?.id1 } });
     }
 
     async getFollow(account: string) {
-        const user = await this.user.findOne({ account }).populate('followers');
-        return user?.followers ? user?.followers : [];
+        const user = await this.user.findOne({ account });
+        return user;
     }
 
     async getUser(id: string) {
@@ -113,21 +130,22 @@ export class UsersService {
 
     async getComment(account: string) {
         const user = await this.user.findOne({ account }).lean();
-        return user?.comment.length ? user?.comment : [];
+        return user?.comment?.length ? user?.comment : [];
     }
 
-    async addComment(account: string, content: string, star: number) {
+    async addComment(account: string, content: string, star: number, account_comment: string) {
+        const user_comment = await this.user.findOne({ account: account_comment }).lean();
         const user = await this.user.findOne({ account }).lean();
         const comment = {
-            login_name: user?.login_name,
-            user_id: user?._id,
+            login_name: user_comment?.login_name,
+            user_id: user_comment?._id,
             content,
             updated_at: new Date(),
             star,
             id: user?.comment[0]?.id ? user?.comment[0]?.id + 1 : 1,
         };
         await this.user.updateOne(
-            { account: user?.account },
+            { account },
             {
                 $push: {
                     comment: {
@@ -140,18 +158,21 @@ export class UsersService {
     }
 
     async deleteComment(account: string, id: number) {
-        const user = await this.user.findOne({ account }).lean();
-        await this.user.updateOne({ account: user?.account }, { $pull: { comment: { id } } });
+        await this.user.updateOne({ account }, { $pull: { comment: { id } } });
     }
 
-    async editComment(account: string, comment: any) {
-        const user = await this.user.findOne({ account }).lean();
-        await this.user.updateOne({ account: user?.account }, { $pull: { comment: { id: comment?.id } } });
-        comment.updated_at = new Date();
-        comment.login_name = comment.author;
-        comment.star = comment.rating;
+    async editComment(account: string, data: any) {
+        await this.user.updateOne({ account }, { $pull: { comment: { id: data?.id } } });
+        const comment = {
+            updated_at: new Date(),
+            login_name: data?.author,
+            star: data?.rating,
+            id: data?.id,
+            user_id: data?.user_id,
+            content: data?.content
+        }
         await this.user.updateOne(
-            { account: user?.account },
+            { account },
             {
                 $push: {
                     comment: {
@@ -161,5 +182,33 @@ export class UsersService {
                 },
             },
         );
+    }
+
+    async getApplyJob(account: string) {
+        let result: object[] = [];
+        const user = await this.user.findOne({ account }).populate('apply_jobs').lean();
+        const apply_jobs = user?.apply_jobs;
+        for (let i = 0; i < apply_jobs.length; i++) {
+            const id = apply_jobs[i].user_id;
+            const user = await this.user.findById(id).lean();
+            const apply_job = { ...apply_jobs[i], user };
+            result.push(apply_job);
+        }
+        return result;
+    }
+
+    async editUserCompany(account: string, data: any) {
+        const user = await this.user.findOne({ account });
+
+        if (user?.role != 'company') {
+            return {
+                mes: 'Bạn phải là tài khoản công ty mới có thể cập nhật',
+            };
+        }
+        await this.user.updateOne({ account }, data);
+        return {
+            mes: 'Cập nhật trang công ty thành công',
+            user: await this.user.findOne({ account }),
+        };
     }
 }

@@ -3,10 +3,16 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { MailerService } from '@nestjs-modules/mailer';
+import { User } from 'src/schema/user.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
 
 @Controller('apply')
 export class ApplyController {
-    constructor(private readonly mailerService: MailerService) {}
+    constructor(
+        private readonly mailerService: MailerService,
+        @InjectModel(User.name) private user: Model<User>,
+    ) {}
     @Post('upload-file')
     @UseInterceptors(
         FileInterceptor('file', {
@@ -30,8 +36,21 @@ export class ApplyController {
     )
     async handleUpload(
         @UploadedFile() file: Express.Multer.File,
-        @Body() body: { name: string; email: string; phone: string; intro?: string; to: any },
+        @Body() body: { name: string; email: string; phone: string; intro?: string; to: any; id: string },
+        @Request() req: any,
     ) {
+        const apply_job_id = new Types.ObjectId(body?.id);
+        await this.user.updateOne(
+            { account: req?.user?.account },
+            {
+                $addToSet: {
+                    apply_jobs: {
+                        $each: [apply_job_id],
+                    },
+                },
+            },
+        );
+
         await this.mailerService.sendMail({
             to: body.to,
             subject: 'Tìm việc 24/7',
@@ -54,6 +73,4 @@ export class ApplyController {
             data: body,
         };
     }
-
-
 }

@@ -34,7 +34,7 @@ export class User extends Document {
     @Prop({ default: '' })
     address: string;
 
-        @Prop()
+    @Prop()
     description: string;
 
     @Prop({ default: 5 })
@@ -57,14 +57,17 @@ export class User extends Document {
     @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }] })
     save_jobs: Post[];
 
+    @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }] })
+    apply_jobs: Post[];
+
     @Prop({ default: [] })
-    follwing: { avatar: string; login_name: string; user_id: ObjectId }[];
+    follwing: string[];
 
     @Prop({ default: [] })
     followers: string[];
 
     @Prop({ default: [] })
-    comment: { login_name: string; user_id: ObjectId; content: string, updated_at: Date, star: number, id: number }[];
+    comment: { login_name: string; user_id: ObjectId; content: string; updated_at: Date; star: number; id: number }[];
 
     @Prop()
     updated_at: Date;

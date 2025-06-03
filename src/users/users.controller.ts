@@ -35,6 +35,17 @@ export class UsersController {
         return true;
     }
 
+    @Get('get-apply-job')
+    async getApplyJob(@Request() req: any) {
+        return await this.service.getApplyJob(req?.user?.account);
+    }
+
+    @Post('delete-apply-job')
+    async deleteApplyJob(@Request() req: any, @Body() data: any) {
+        await this.service.deleteApplyJob(req?.user?.account, data?.id);
+        return true;
+    }
+
     @Get('get-save-job')
     async getSaveJob(@Request() req: any) {
         return await this.service.getSaveJob(req?.user?.account);
@@ -53,46 +64,53 @@ export class UsersController {
     }
 
     @Get('get-follow')
-    async getFollow(@Request() req: any) {
-        return await this.service.getFollow(req?.user?.account);
+    async getFollow(@Request() req: any, @Query('account') account: string) {
+        if (!account) {
+            account = req?.user?.account;
+        }
+        return await this.service.getFollow(account);
     }
 
     @Post('add-follow')
     async addFollow(@Request() req: any, @Body() data: any) {
-        await this.service.addFollow(req?.user?.account, data?.id);
+        await this.service.addFollow(req?.user?.account, data);
         return true;
     }
 
     @Post('delete-follow')
     async deleteFollow(@Request() req: any, @Body() data: any) {
-        await this.service.deleteFollow(req?.user?.account, data?.id);
+        await this.service.deleteFollow(req?.user?.account, data);
         return true;
     }
 
     @Get('get-comment')
-    async getComment(@Request() req: any) {
-        return await this.service.getComment(req?.user?.account);
+    async getComment(@Request() req: any, @Query('account') account: string) {
+        if (!account) {
+            account = req?.user?.account;
+        }
+
+        return await this.service.getComment(account);
     }
 
     @Post('add-comment')
     async addComment(@Request() req: any, @Body() data: any) {
-        await this.service.addComment(req?.user?.account, data?.content, data?.star);
+        await this.service.addComment(data.account, data?.content, data?.star, req?.user?.account);
         return true;
     }
 
     @Post('delete-comment')
     async deleteComment(@Request() req: any, @Body() data: any) {
-        await this.service.deleteComment(req?.user?.account, data?.id);
+        await this.service.deleteComment(data.account, data?.id);
         return true;
     }
 
     @Post('edit-comment')
-    async edit(@Request() req: any, @Body() data: any) {
-        await this.service.editComment(req?.user?.account, data?.comment);
+    async edit(@Body() data: any) {
+        await this.service.editComment(data.account, data?.comment);
         return true;
     }
 
-    @Post('upload-image')
+    @Post('edit-user-all')
     @UseInterceptors(
         FileInterceptor('file', {
             storage: diskStorage({
@@ -113,14 +131,20 @@ export class UsersController {
             },
         }),
     )
-    async uploadImage(@UploadedFile() file: Express.Multer.File, @Body() body: { name: string; email: string }) {
-        console.log('Ảnh uploaded:', file);
-        console.log('Form data:', body);
-
-        return {
-            message: 'Upload ảnh thành công',
-            file: file,
-            data: body,
+    async uploadImage(@UploadedFile() file: Express.Multer.File, @Body() body: any, @Request() req: any) {
+        const avatar = `/uploads/image/${file.filename}`;
+        const data: any = {
+            avatar,
+            description: body?.description || '',
+            login_name: body?.login_name || '',
+            field: body?.field || '',
+            scale: body?.scale || '',
+            phone: body?.phone || '',
+            email: body?.email || '',
+            web: body?.web || '',
+            address: body?.address || '',
         };
+
+        return await this.service.editUserCompany(req?.user?.account, data);
     }
 }
