@@ -25,6 +25,24 @@ export class PostsService {
         const record_post = await this.post.create({ ...createPostDto, user_id, account });
 
         if (record_post) {
+            const user = await this.user.findOne({ account });
+            for (const element of user?.followers || []) {
+                const follower_id = new Types.ObjectId(element);
+                const follower = await this.user.findOne({ _id: follower_id });
+                if (follower) {
+                    await this.MailerService.sendMail({
+                        to: follower.email,
+                        subject: 'Thông báo từ Tìm việc 24/7',
+                        html: `
+                            <div>
+                                <p>Hi ${follower.login_name},</p>
+                                <p>Công ty: ${user?.company || ''}.</p>
+                                <p>Đã có một bài viết mới được tạo: ${record_post.title}.</p>
+                            </div>
+                        `,
+                    });
+                }
+            }
             return {
                 status_code: 201,
                 message: 'create post success',
