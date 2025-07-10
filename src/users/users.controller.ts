@@ -104,9 +104,24 @@ export class UsersController {
         return true;
     }
 
+    @Post('enter-email')
+    async enterEmail(@Body() data: any) {
+        return await this.service.enterEmail(data?.email);
+    }
+
+    @Post('enter-code')
+    async enterCode(@Body() data: any) {
+        return await this.service.enterCode(data?.code, data?.email);
+    }
+
+    @Post('edit-password')
+    async editPassword(@Body() data: any) {
+        return await this.service.editPassword(data?.password, data?.email);
+    }
+
     @Post('edit-comment')
     async edit(@Body() data: any) {
-        await this.service.editComment(data.account, data?.comment);
+        await this.service.editComment(data?.account, data?.comment);
         return true;
     }
 

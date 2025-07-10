@@ -3,11 +3,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { User } from 'src/schema/user.schema';
 import { JwtService } from 'src/jwt/jwt.service';
+import { MailerService } from '@nestjs-modules/mailer';
+import { Code } from 'src/schema/code.schema';
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectModel(User.name) private user: Model<User>,
+        @InjectModel(Code.name) private code: Model<Code>,
+        private readonly mailerService: MailerService,
         private readonly jwtService: JwtService,
     ) {}
 
@@ -137,14 +141,14 @@ export class UsersService {
         const user_comment = await this.user.findOne({ account: account_comment }).lean();
         const user = await this.user.findOne({ account }).lean();
         const comment_old = user?.comment || [];
-        const id = comment_old.length > 0 ? (comment_old[0]?.id + 1) : 1
+        const id = comment_old.length > 0 ? comment_old[0]?.id + 1 : 1;
         const comment = {
             login_name: user_comment?.login_name,
             user_id: user_comment?._id,
             content,
             updated_at: new Date(),
             star,
-            id
+            id,
         };
         await this.user.updateOne(
             { account },
@@ -171,8 +175,8 @@ export class UsersService {
             star: data?.rating,
             id: data?.id,
             user_id: data?.user_id,
-            content: data?.content
-        }
+            content: data?.content,
+        };
         await this.user.updateOne(
             { account },
             {
@@ -211,6 +215,48 @@ export class UsersService {
         return {
             mes: 'Cập nhật trang công ty thành công',
             user: await this.user.findOne({ account }),
+        };
+    }
+
+    async enterEmail(email: string) {
+        const user = await this.user.findOne({ email });
+        const code = Math.floor(100000 + Math.random() * 900000);
+        await this.code.deleteMany({ email });
+        await this.code.create({ email, code });
+        await this.mailerService.sendMail({
+            to: email,
+            subject: 'Tìm việc 24/7',
+            html: `
+                <div>Mã khôi phục: ${code}</div>
+            `,
+        });
+        return {
+            message: 'Send email successfully',
+            status: 200,
+        };
+    }
+
+    async enterCode(code: string, email: string) {
+        const record_code = await this.code.findOne({ email, code });
+        if (!record_code) {
+            return {
+                message: 'Mã không đúng hoặc đã hết hạn',
+                status: 404,
+            };
+        }
+
+        return {
+            message: 'Mã đúng',
+            status: 200,
+        };
+    }
+
+    async editPassword(password: string, email: string) {
+        await this.user.updateOne({ email }, { password });
+
+        return {
+            message: 'Đổi mật khẩu thành công',
+            status: 200,
         };
     }
 }

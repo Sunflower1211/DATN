@@ -4,6 +4,7 @@ import { UsersController } from './users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema, User } from 'src/schema/user.schema';
 import { JwtModule } from 'src/jwt/jwt.module';
+import { Code, CodeSchema } from 'src/schema/code.schema';
 
 @Module({
     imports: [
@@ -11,6 +12,10 @@ import { JwtModule } from 'src/jwt/jwt.module';
             {
                 name: User.name,
                 schema: UserSchema,
+            },
+            {
+                name: Code.name,
+                schema: CodeSchema,
             },
         ]),
         JwtModule
