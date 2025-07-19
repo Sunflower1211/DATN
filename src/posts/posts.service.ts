@@ -6,6 +6,7 @@ import { Post } from 'src/schema/post.schema';
 import { User } from 'src/schema/user.schema';
 import { Model } from 'mongoose';
 import { Types } from 'mongoose';
+import { MailerService } from '@nestjs-modules/mailer';
 
 interface user_interface {
     avatar?: string;
@@ -17,6 +18,7 @@ export class PostsService {
     constructor(
         @InjectModel(Post.name) private post: Model<Post>,
         @InjectModel(User.name) private user: Model<User>,
+        private readonly mailerService: MailerService,
     ) {}
 
     async create(createPostDto: CreatePostDto, account: string) {
@@ -30,13 +32,13 @@ export class PostsService {
                 const follower_id = new Types.ObjectId(element);
                 const follower = await this.user.findOne({ _id: follower_id });
                 if (follower) {
-                    await this.MailerService.sendMail({
+                    await this.mailerService.sendMail({
                         to: follower.email,
                         subject: 'Thông báo từ Tìm việc 24/7',
                         html: `
                             <div>
                                 <p>Hi ${follower.login_name},</p>
-                                <p>Công ty: ${user?.company || ''}.</p>
+                                <p>Công ty: ${user?.login_name || ''}.</p>
                                 <p>Đã có một bài viết mới được tạo: ${record_post.title}.</p>
                             </div>
                         `,
